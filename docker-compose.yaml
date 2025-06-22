@@ -81,7 +81,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-    - ${AIRFLOW_PROJ_DIR:-.}/web_scraper:/opt/airflow/web_scraper
+    - ${AIRFLOW_PROJ_DIR:-.}/scraper:/opt/airflow/scraper
     - ${AIRFLOW_PROJ_DIR:-.}/gdrive:/opt/airflow/gdrive
     - ${AIRFLOW_PROJ_DIR:-.}/data_staging:/opt/airflow/data_staging
 
