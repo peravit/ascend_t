@@ -4,21 +4,36 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-
+import sys
+sys.path.append('/opt/airflow')
 from scraper.bs4_scraper_ihave import scrape_ihavecpu_notebook
 from plugins.df_to_excel import save_to_excel
+from plugins.upload_gdrive import upload_to_gdrive
 
 default_args = {
     "start_date": datetime(2024, 1, 1)
 }
 
-def run_scrape_ihave():
+target_file_path = None
+file_name  ="ihave_notebook"
+
+def run_scrape_ihave(ti):
     df = scrape_ihavecpu_notebook()
-    save_to_excel(df, "ihave_notebook.xlsx")
+    file_path = save_to_excel(df, file_name)
+    ti.xcom_push(key="excel_path", value=file_path)
+    print(f"Pushed file path: {file_path}")
+
+def upload_task(ti):
+    file_path = ti.xcom_pull(task_ids="scrape_ihave", key="excel_path")
+    if not file_path:
+        raise ValueError("File path not found from XCom")
+    upload_to_gdrive(file_path)
+
+
 
 with DAG(
     dag_id="ihave_scraper_dag",
-    schedule_interval="0 7 * * *",
+    schedule_interval="5 7 * * *",
     default_args=default_args,
     catchup=False,
     tags=["ihave", "scraper"]
@@ -28,3 +43,9 @@ with DAG(
         task_id="scrape_ihave",
         python_callable=run_scrape_ihave
     )
+
+    upload_to_gdrive_task = PythonOperator(
+    task_id="upload_to_gdrive",
+    python_callable=upload_task
+    )
+scrape_task >> upload_to_gdrive_task

@@ -21,4 +21,5 @@ RUN pip install --no-cache-dir \
     dataframe_image==0.2.7 \
     SQLAlchemy==1.4.49\
     requests==2.31.0\
-    beautifulsoup4
+    beautifulsoup4\
+    PyDrive2==1.21.3
